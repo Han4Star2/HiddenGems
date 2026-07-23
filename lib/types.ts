@@ -48,3 +48,29 @@ export interface Game {
   discord: DiscordInfo;
   statHistory: StatPoint[];
 }
+
+export interface Watchlist {
+  id: string;
+  name: string;
+  gameIds: string[];
+}
+
+export interface NotificationPreferences {
+  newHiddenGem: boolean;
+  strongGrowth: boolean;
+  newDiscordFound: boolean;
+  scoreThreshold: number | null;
+  instant: boolean; // Premium-Feature
+}
+
+export interface SessionUser {
+  robloxUserId: number;
+  username: string;
+  displayName: string;
+  avatarUrl?: string;
+  premium: boolean;
+  savedGameIds: string[];
+  followedDeveloperIds: string[];
+  watchlists: Watchlist[];
+  notificationPreferences: NotificationPreferences;
+}

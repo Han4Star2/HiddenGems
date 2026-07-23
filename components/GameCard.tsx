@@ -6,6 +6,7 @@ import { formatCompactNumber, formatGrowth } from "@/lib/scoring";
 import { ageInDays } from "@/lib/filters";
 import ScoreBadge from "./ScoreBadge";
 import DiscordButton from "./DiscordButton";
+import SaveGameButton from "./SaveGameButton";
 
 export default function GameCard({ game }: { game: Game }) {
   const developer = getDeveloperForGame(game);
@@ -26,6 +27,9 @@ export default function GameCard({ game }: { game: Game }) {
         />
         <div className="absolute right-2 top-2">
           <ScoreBadge score={game.hiddenGemScore} />
+        </div>
+        <div className="absolute left-2 top-2">
+          <SaveGameButton gameId={game.id} />
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">

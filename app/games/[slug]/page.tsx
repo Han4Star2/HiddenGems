@@ -7,6 +7,7 @@ import { formatCompactNumber, formatGrowth } from "@/lib/scoring";
 import ScoreBadge from "@/components/ScoreBadge";
 import DiscordButton from "@/components/DiscordButton";
 import StatChart from "@/components/StatChart";
+import SaveGameButton from "@/components/SaveGameButton";
 
 export function generateStaticParams() {
   return games.map((g) => ({ slug: g.slug }));
@@ -75,6 +76,7 @@ export default async function GamePage({
             Auf Roblox öffnen
           </a>
           <DiscordButton discord={game.discord} showSource />
+          <SaveGameButton gameId={game.id} />
         </div>
       </div>
 

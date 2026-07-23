@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { developers, getDeveloperBySlug, getGamesForDeveloper } from "@/lib/mockData";
 import { formatCompactNumber, formatGrowth } from "@/lib/scoring";
 import GameCard from "@/components/GameCard";
+import FollowButton from "@/components/FollowButton";
 
 export function generateStaticParams() {
   return developers.map((d) => ({ slug: d.slug }));
@@ -40,16 +41,19 @@ export default async function DeveloperPage({
           <h1 className="text-2xl font-bold">{developer.name}</h1>
           <p className="text-sm text-foreground/60">{developer.memberCount} Mitglieder</p>
         </div>
-        {developer.discordUrl && (
-          <a
-            href={developer.discordUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#5865F2]/15 px-3 py-1.5 text-xs font-medium text-[#a6b0ff] hover:bg-[#5865F2]/25"
-          >
-            🎮 Offizieller Discord
-          </a>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {developer.discordUrl && (
+            <a
+              href={developer.discordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#5865F2]/15 px-3 py-1.5 text-xs font-medium text-[#a6b0ff] hover:bg-[#5865F2]/25"
+            >
+              🎮 Offizieller Discord
+            </a>
+          )}
+          <FollowButton developerId={developer.id} />
+        </div>
       </div>
 
       <p className="max-w-3xl text-foreground/70">{developer.description}</p>
