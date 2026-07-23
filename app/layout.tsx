@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "@/components/SessionProvider";
 
@@ -34,8 +35,16 @@ export default function RootLayout({
         <SessionProvider>
           <Navbar />
           <main className="flex-1">{children}</main>
-          <footer className="border-t border-border py-8 text-center text-sm text-foreground/50">
-            Hidden Gems · Kleine Roblox-Spiele mit großem Potenzial
+          <footer className="flex flex-col items-center gap-2 border-t border-border py-8 text-center text-sm text-foreground/50">
+            <span>Hidden Gems · Kleine Roblox-Spiele mit großem Potenzial</span>
+            <div className="flex gap-4 text-xs">
+              <Link href="/privacy" className="hover:text-foreground/80">
+                Datenschutz
+              </Link>
+              <Link href="/terms" className="hover:text-foreground/80">
+                Nutzungsbedingungen
+              </Link>
+            </div>
           </footer>
         </SessionProvider>
       </body>
