@@ -1,4 +1,6 @@
 import { Developer, Game, StatPoint } from "./types";
+import { calculateHiddenGemScore } from "./hiddenGemScore";
+import { detectOfficialDiscord } from "./discord";
 
 function daysAgo(n: number): string {
   const d = new Date();
@@ -124,7 +126,6 @@ interface GameSeed {
   favorites: number;
   growth24h: number;
   growth7d: number;
-  hiddenGemScore: number;
   editorsPick: boolean;
   discordSource: "game" | "group";
 }
@@ -148,7 +149,6 @@ const seeds: GameSeed[] = [
     favorites: 6200,
     growth24h: 18.4,
     growth7d: 92.1,
-    hiddenGemScore: 88,
     editorsPick: true,
     discordSource: "group",
   },
@@ -170,7 +170,6 @@ const seeds: GameSeed[] = [
     favorites: 890,
     growth24h: 34.2,
     growth7d: 210.5,
-    hiddenGemScore: 81,
     editorsPick: false,
     discordSource: "group",
   },
@@ -192,7 +191,6 @@ const seeds: GameSeed[] = [
     favorites: 21000,
     growth24h: 6.1,
     growth7d: 28.3,
-    hiddenGemScore: 74,
     editorsPick: false,
     discordSource: "game",
   },
@@ -214,7 +212,6 @@ const seeds: GameSeed[] = [
     favorites: 410,
     growth24h: 61.0,
     growth7d: 340.0,
-    hiddenGemScore: 79,
     editorsPick: true,
     discordSource: "game",
   },
@@ -236,7 +233,6 @@ const seeds: GameSeed[] = [
     favorites: 7100,
     growth24h: 4.8,
     growth7d: 15.2,
-    hiddenGemScore: 70,
     editorsPick: false,
     discordSource: "group",
   },
@@ -258,7 +254,6 @@ const seeds: GameSeed[] = [
     favorites: 31000,
     growth24h: 2.1,
     growth7d: 9.4,
-    hiddenGemScore: 61,
     editorsPick: false,
     discordSource: "game",
   },
@@ -280,7 +275,6 @@ const seeds: GameSeed[] = [
     favorites: 3600,
     growth24h: 22.6,
     growth7d: 145.0,
-    hiddenGemScore: 84,
     editorsPick: true,
     discordSource: "game",
   },
@@ -302,7 +296,6 @@ const seeds: GameSeed[] = [
     favorites: 16800,
     growth24h: 12.9,
     growth7d: 58.7,
-    hiddenGemScore: 77,
     editorsPick: false,
     discordSource: "game",
   },
@@ -324,7 +317,6 @@ const seeds: GameSeed[] = [
     favorites: 260,
     growth24h: 88.0,
     growth7d: 88.0,
-    hiddenGemScore: 68,
     editorsPick: false,
     discordSource: "group",
   },
@@ -346,7 +338,6 @@ const seeds: GameSeed[] = [
     favorites: 4400,
     growth24h: 5.5,
     growth7d: 22.0,
-    hiddenGemScore: 72,
     editorsPick: false,
     discordSource: "group",
   },
@@ -368,7 +359,6 @@ const seeds: GameSeed[] = [
     favorites: 6100,
     growth24h: 26.3,
     growth7d: 130.8,
-    hiddenGemScore: 83,
     editorsPick: true,
     discordSource: "game",
   },
@@ -390,45 +380,70 @@ const seeds: GameSeed[] = [
     favorites: 190,
     growth24h: 45.0,
     growth7d: 250.0,
-    hiddenGemScore: 75,
     editorsPick: false,
     discordSource: "game",
   },
 ];
 
-export const games: Game[] = seeds.map((seed) => ({
-  id: seed.id,
-  slug: seed.slug,
-  name: seed.name,
-  thumbnailUrl: `https://picsum.photos/seed/${seed.slug}/600/338`,
-  genre: seed.genre,
-  description: seed.description,
-  createdAt: daysAgo(seed.createdDaysAgo),
-  lastUpdatedAt: daysAgo(seed.updatedDaysAgo),
-  developerId: seed.developerId,
-  groupName: seed.groupName,
-  robloxUrl: `https://www.roblox.com/games/0000000/${seed.slug}`,
-  currentPlayers: seed.currentPlayers,
-  visits: seed.visits,
-  likes: seed.likes,
-  dislikes: seed.dislikes,
-  favorites: seed.favorites,
-  growth24h: seed.growth24h,
-  growth7d: seed.growth7d,
-  hiddenGemScore: seed.hiddenGemScore,
-  editorsPick: seed.editorsPick,
-  discord: {
-    found: true,
-    url: `https://discord.gg/${seed.slug}`,
-    source: seed.discordSource,
-  },
-  statHistory: generateHistory(
-    Math.min(seed.createdDaysAgo, 30),
-    seed.currentPlayers,
-    seed.visits,
-    seed.favorites
-  ),
-}));
+export const games: Game[] = seeds.map((seed) => {
+  // Discord-Invite steckt je nach Quelle in der Spiel- oder Gruppenbeschreibung,
+  // genau wie es die echte Erkennung später bei echten Roblox-Texten vorfindet.
+  const gameDescriptionRaw =
+    seed.discordSource === "game"
+      ? `${seed.description} Offizieller Discord: https://discord.gg/${seed.slug}`
+      : seed.description;
+  const groupDescriptionRaw =
+    seed.discordSource === "group"
+      ? `Offizielle Gruppe von ${seed.groupName}. Community & Support: https://discord.gg/${seed.slug}`
+      : `Offizielle Gruppe von ${seed.groupName}.`;
+
+  const discord = detectOfficialDiscord({
+    gameDescription: gameDescriptionRaw,
+    groupDescription: groupDescriptionRaw,
+  });
+
+  const score = calculateHiddenGemScore({
+    currentPlayers: seed.currentPlayers,
+    growth24h: seed.growth24h,
+    growth7d: seed.growth7d,
+    likes: seed.likes,
+    dislikes: seed.dislikes,
+    favorites: seed.favorites,
+    visits: seed.visits,
+    ageDays: seed.createdDaysAgo,
+    daysSinceLastUpdate: seed.updatedDaysAgo,
+  });
+
+  return {
+    id: seed.id,
+    slug: seed.slug,
+    name: seed.name,
+    thumbnailUrl: `https://picsum.photos/seed/${seed.slug}/600/338`,
+    genre: seed.genre,
+    description: seed.description,
+    createdAt: daysAgo(seed.createdDaysAgo),
+    lastUpdatedAt: daysAgo(seed.updatedDaysAgo),
+    developerId: seed.developerId,
+    groupName: seed.groupName,
+    robloxUrl: `https://www.roblox.com/games/0000000/${seed.slug}`,
+    currentPlayers: seed.currentPlayers,
+    visits: seed.visits,
+    likes: seed.likes,
+    dislikes: seed.dislikes,
+    favorites: seed.favorites,
+    growth24h: seed.growth24h,
+    growth7d: seed.growth7d,
+    hiddenGemScore: score.total,
+    editorsPick: seed.editorsPick,
+    discord,
+    statHistory: generateHistory(
+      Math.min(seed.createdDaysAgo, 30),
+      seed.currentPlayers,
+      seed.visits,
+      seed.favorites
+    ),
+  };
+});
 
 export function getGameBySlug(slug: string): Game | undefined {
   return games.find((g) => g.slug === slug);
