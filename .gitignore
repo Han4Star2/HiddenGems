@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# lokaler Fallback-Store für lib/blobStore.ts (nur außerhalb von Netlify)
+/.data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

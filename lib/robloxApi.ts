@@ -95,6 +95,13 @@ export async function getGameThumbnailUrl(universeId: number): Promise<string | 
   return data.data[0]?.imageUrl;
 }
 
+export async function getGroupIconUrl(groupId: number): Promise<string | undefined> {
+  const data = await fetchJson<{ data: { targetId: number; imageUrl: string }[] }>(
+    `${THUMBNAILS_API}/v1/groups/icons?groupIds=${groupId}&size=420x420&format=Png`
+  );
+  return data.data[0]?.imageUrl;
+}
+
 /**
  * Lädt alle für Hidden Gems relevanten Rohdaten zu einem Spiel in einem
  * Rutsch. Wirft, wenn eine der Teilanfragen fehlschlägt — Aufrufer

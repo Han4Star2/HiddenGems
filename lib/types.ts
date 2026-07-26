@@ -36,6 +36,9 @@ export interface Game {
   developerId: string;
   groupName?: string;
   robloxUrl: string;
+  /** Nur bei echt eingelesenen (nicht Mock-)Spielen gesetzt, für den Refresh-Zyklus. */
+  robloxPlaceId?: number;
+  robloxCreatorType?: "User" | "Group";
   currentPlayers: number;
   visits: number;
   likes: number;
