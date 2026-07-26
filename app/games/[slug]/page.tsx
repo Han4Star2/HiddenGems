@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { games, getDeveloperForGame, getGameBySlug } from "@/lib/mockData";
+import { findDeveloperForGame, findGameBySlug } from "@/lib/dataSource";
 import { ageInDays, favoriteRatio, likeRate } from "@/lib/filters";
 import { formatCompactNumber, formatGrowth } from "@/lib/scoring";
 import ScoreBadge from "@/components/ScoreBadge";
@@ -9,20 +9,16 @@ import DiscordButton from "@/components/DiscordButton";
 import StatChart from "@/components/StatChart";
 import SaveGameButton from "@/components/SaveGameButton";
 
-export function generateStaticParams() {
-  return games.map((g) => ({ slug: g.slug }));
-}
-
 export default async function GamePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const game = getGameBySlug(slug);
+  const game = await findGameBySlug(slug);
   if (!game) notFound();
 
-  const developer = getDeveloperForGame(game);
+  const developer = await findDeveloperForGame(game);
   const age = ageInDays(game);
   const hourlyGrowth = game.growth24h / 24;
 
@@ -40,8 +36,10 @@ export default async function GamePage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6">
-      <div className="relative h-64 w-full overflow-hidden rounded-2xl sm:h-80">
-        <Image src={game.thumbnailUrl} alt={game.name} fill className="object-cover" priority />
+      <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-surface sm:h-80">
+        {game.thumbnailUrl && (
+          <Image src={game.thumbnailUrl} alt={game.name} fill className="object-cover" priority />
+        )}
       </div>
 
       <div className="flex flex-col gap-4">

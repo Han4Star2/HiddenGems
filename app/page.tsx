@@ -1,9 +1,15 @@
 import Link from "next/link";
-import { games } from "@/lib/mockData";
+import { getAllGames } from "@/lib/dataSource";
 import { buildCategories } from "@/lib/categories";
 import GameSection from "@/components/GameSection";
 
-export default function Home() {
+// Echte Spiele können jederzeit über /api/games/submit neu hinzukommen —
+// ohne dynamisches Rendering würde die Startseite den zur Build-Zeit
+// vorgefundenen (leeren) Stand einfrieren.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const games = await getAllGames();
   const categories = buildCategories(games);
 
   return (

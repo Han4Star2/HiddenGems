@@ -1,13 +1,9 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { developers, getDeveloperBySlug, getGamesForDeveloper } from "@/lib/mockData";
+import { findDeveloperBySlug, findGamesForDeveloper } from "@/lib/dataSource";
 import { formatCompactNumber, formatGrowth } from "@/lib/scoring";
 import GameCard from "@/components/GameCard";
 import FollowButton from "@/components/FollowButton";
-
-export function generateStaticParams() {
-  return developers.map((d) => ({ slug: d.slug }));
-}
 
 export default async function DeveloperPage({
   params,
@@ -15,10 +11,10 @@ export default async function DeveloperPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const developer = getDeveloperBySlug(slug);
+  const developer = await findDeveloperBySlug(slug);
   if (!developer) notFound();
 
-  const developerGames = getGamesForDeveloper(developer.id);
+  const developerGames = await findGamesForDeveloper(developer.id);
   const totalPlayers = developerGames.reduce((sum, g) => sum + g.currentPlayers, 0);
   const totalVisits = developerGames.reduce((sum, g) => sum + g.visits, 0);
   const avgGrowth7d =
@@ -34,8 +30,10 @@ export default async function DeveloperPage({
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6">
       <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-border">
-          <Image src={developer.avatarUrl} alt={developer.name} fill className="object-cover" />
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-border bg-surface">
+          {developer.avatarUrl && (
+            <Image src={developer.avatarUrl} alt={developer.name} fill className="object-cover" />
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">{developer.name}</h1>

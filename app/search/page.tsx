@@ -1,16 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { games } from "@/lib/mockData";
+import { useAllGames } from "@/components/useAllGames";
 import { allGenres, searchGames, SearchFilters } from "@/lib/filters";
 import SearchBar from "@/components/SearchBar";
 import FilterPanel from "@/components/FilterPanel";
 import GameCard from "@/components/GameCard";
 
 export default function SearchPage() {
+  const games = useAllGames();
   const [filters, setFilters] = useState<SearchFilters>({});
-  const genres = useMemo(() => allGenres(games), []);
-  const results = useMemo(() => searchGames(games, filters), [filters]);
+  const genres = useMemo(() => allGenres(games), [games]);
+  const results = useMemo(() => searchGames(games, filters), [games, filters]);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6">

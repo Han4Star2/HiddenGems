@@ -1,5 +1,5 @@
 import { getSession } from "@/lib/session";
-import { games, developers } from "@/lib/mockData";
+import { getAllGames, getAllDevelopers } from "@/lib/dataSource";
 import { getPremiumGamepassUrl } from "@/lib/premium";
 import GameCard from "@/components/GameCard";
 import WatchlistManager from "@/components/WatchlistManager";
@@ -26,6 +26,7 @@ export default async function AccountPage() {
     );
   }
 
+  const [games, developers] = await Promise.all([getAllGames(), getAllDevelopers()]);
   const savedGames = games.filter((g) => session.savedGameIds.includes(g.id));
   const followedDevelopers = developers.filter((d) =>
     session.followedDeveloperIds.includes(d.id)

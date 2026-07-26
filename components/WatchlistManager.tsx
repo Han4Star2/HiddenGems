@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { games } from "@/lib/mockData";
+import { useAllGames } from "./useAllGames";
 import { useSession } from "./SessionProvider";
 
 export default function WatchlistManager() {
   const { session, refresh } = useSession();
+  const games = useAllGames();
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string | null>(null);
 

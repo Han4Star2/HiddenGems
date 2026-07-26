@@ -1,5 +1,4 @@
 import { Game } from "./types";
-import { getDeveloperForGame } from "./mockData";
 
 export interface SearchFilters {
   query?: string;
@@ -32,11 +31,8 @@ export function searchGames(games: Game[], filters: SearchFilters): Game[] {
   return games.filter((game) => {
     if (filters.query) {
       const q = filters.query.toLowerCase();
-      const developer = getDeveloperForGame(game);
       const matches =
-        game.name.toLowerCase().includes(q) ||
-        developer?.name.toLowerCase().includes(q) ||
-        game.groupName?.toLowerCase().includes(q);
+        game.name.toLowerCase().includes(q) || game.groupName?.toLowerCase().includes(q);
       if (!matches) return false;
     }
     if (filters.genre && game.genre !== filters.genre) return false;
